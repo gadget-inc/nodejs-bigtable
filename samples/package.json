@@ -1,0 +1,33 @@
+{
+  "name": "@google-cloud/bigtable-samples",
+  "private": true,
+  "license": "Apache-2.0",
+  "author": "Google Inc.",
+  "repository": "googleapis/nodejs-bigtable",
+  "files": [
+    "*.js",
+    "functions/*.js",
+    "hello-world/*.js",
+    "api-reference-doc-snippets/*.js"
+  ],
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "@google-cloud/bigtable": "^5.1.2",
+    "uuid": "^9.0.0",
+    "yargs": "^16.0.0"
+  },
+  "devDependencies": {
+    "@google-cloud/functions-framework": "^3.0.0",
+    "chai": "^4.2.0",
+    "mocha": "^8.0.0",
+    "snap-shot-it": "^7.9.1",
+    "request": "^2.88.0",
+    "requestretry": "^7.0.0"
+  },
+  "scripts": {
+    "test": "mocha --timeout=600000",
+    "test:snap": "SNAPSHOT_UPDATE=1 npm test"
+  }
+}
