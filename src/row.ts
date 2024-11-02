@@ -146,7 +146,7 @@ export class RowError extends Error {
   constructor(row: string) {
     super();
     this.name = 'RowError';
-    this.message = `Unknown row: ${row}.`;
+    this.message = `Unknown row: ${row}`;
     this.code = 404;
   }
 }
