@@ -1,3 +1,4 @@
+/* eslint-disable eqeqeq */
 // Copyright 2016 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -213,17 +214,17 @@ export class Filter {
    * ```
    */
   static createRange(
-    start: BoundData | null,
-    end: BoundData | null,
+    start: BoundData | null | undefined,
+    end: BoundData | null | undefined,
     key: string
   ) {
     const range = {};
 
-    if (start) {
+    if (start != null) {
       Object.assign(range, createBound('start', start, key));
     }
 
-    if (end) {
+    if (end != null) {
       Object.assign(range, createBound('end', end, key));
     }
 
@@ -233,7 +234,8 @@ export class Filter {
       const isInclusive = boundData.inclusive !== false;
       const boundKey = boundName + key + (isInclusive ? 'Closed' : 'Open');
       const bound = {} as {[index: string]: {}};
-      bound[boundKey] = Mutation.convertToBytes(boundData.value || boundData);
+      const value = boundData.value != null ? boundData.value : boundData;
+      bound[boundKey] = Mutation.convertToBytes(value);
       return bound;
     }
   }
@@ -605,6 +607,48 @@ export class Filter {
    */
   interleave(filters: RawFilter[]): void {
     this.set('interleave', {
+      filters: filters.map(Filter.parse),
+    });
+  }
+
+  /**
+   * This filter applies a series of filters, in order, to each output row. A chain filter is like using a logical AND.
+   *
+   * @param {object} filters Each filter in the chain sees only the output of the previous filter. For example, if you chain two filters, and the first filter removes half of the cells from the output row, the second filter does not have access to the cells that were removed.
+   *
+   * @example
+   * ```
+   * //-
+   * // In the following example, we're creating a filter that will retrieve
+   * // results for entries that were created between December 17th, 2015
+   * // and March 22nd, 2016 and entries that have data for `follows:tjefferson`.
+   * //-
+   * const filter = [
+   *   {
+   *     chain: [
+   *       [
+   *         {
+   *           time: {
+   *             start: new Date('December 17, 2015'),
+   *             end: new Date('March 22, 2016')
+   *           }
+   *         }
+   *       ],
+   *       [
+   *         {
+   *           family: 'follows'
+   *         },
+   *         {
+   *           column: 'tjefferson'
+   *         }
+   *       ]
+   *     ]
+   *   }
+   * ];
+   * ```
+   */
+  chain(filters: RawFilter[]): void {
+    this.set('chain', {
       filters: filters.map(Filter.parse),
     });
   }
@@ -994,14 +1038,14 @@ export class Filter {
       v = value as ValueFilter;
     }
 
-    if (v.value) {
+    if (v.value != null) {
       const valueReg = Mutation.convertToBytes(
         Filter.convertToRegExpString(v.value)
       );
       this.set('valueRegexFilter', valueReg);
     }
 
-    if (v.start || v.end) {
+    if (v.start != null || v.end != null) {
       const range = Filter.createRange(v.start!, v.end!, 'Value');
       this.set('valueRangeFilter', range);
     }
